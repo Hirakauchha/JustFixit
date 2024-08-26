@@ -14,5 +14,5 @@ mongoose.connect("mongodb+srv://hirakauchha1234:kju5n8Vmhc2ydXen@justfixbackendd
     console.log("Connected to Database!");
 })
 .catch(()=>{
-    console.log("Connection Failed k");
+    console.log("Connection Failed");
 })
