@@ -1,27 +1,23 @@
 const express= require('express')
 const mongoose= require('mongoose');
 const Service= require('./models/service.js');
+const serviceRoute = require("./routes/services.route.js")
+//middleware
 const app= express()
 app.use(express.json());
+
+// routes
+app.use("/api/services", serviceRoute)
 
 app.listen(3001,()=>{
     console.log('Server is running on port 3001');
 });
+
 app.get('/',(req, res)=>{
     res.send("Hello from Node API created by Hira Kauchha");
 
 });
-app.get('/api/service',async(req, res)=>{
-    try {
-     const service=await Service.find({});
-     res.status(200).json(service);
-     
-    } catch (error) {
-     res.status(500).json({message:error.message}); 
-     
-    }
- 
- });
+
  app.get('/api/service/:id',async(req,res)=>{
     try {
         const { id }=req.params;
@@ -59,8 +55,6 @@ app.put('/api/service/:id',async(req, res)=>{
     }
     catch(error){
         res.status(500).json({message: error.message});
-
-
     }
 
 });
