@@ -35,6 +35,7 @@ app.get('/api/service',async(req, res)=>{
 app.post('/api/service',async(req, res)=>{
     console.log(req.body)
     try{
+        
         const service=await Service.create(req.body);
         res.status(200).json(service);
     }
@@ -46,6 +47,23 @@ app.post('/api/service',async(req, res)=>{
 
 });
 
+app.put('/api/service/:id',async(req, res)=>{
+    try{
+        const { id }=req.params;
+        const service=await Service.findByIdAndUpdate(id,req.body);
+        if(!service){
+            return res.status(404).json({message:"Service not found"});
+        }
+        const updateservice = await Service.findById(id);
+        res.status(200).json(updateservice);
+    }
+    catch(error){
+        res.status(500).json({message: error.message});
+
+
+    }
+
+});
 
 mongoose.connect("mongodb+srv://hirakauchha1234:kju5n8Vmhc2ydXen@justfixbackenddb.vezsaoj.mongodb.net/JustFix-API?retryWrites=true&w=majority&appName=JustFixBackendDB") 
 .then(()=>{
