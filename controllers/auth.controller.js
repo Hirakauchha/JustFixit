@@ -1,12 +1,15 @@
 const  express = require("express");
+const {promisify}= require('util');
 const UserModel= require('../models/user.model.js')
 const bcrypt = require('bcryptjs');
 const jwt= require('jsonwebtoken');
+const { decode } = require("punycode");
 
 
 const maxAge=9*24*60*60
+const secretkey='justfixit-secret'
 const signToken = id => { 
-    return jwt.sign({id:id},'justfixit-secret',{
+    return jwt.sign({id:id},secretkey,{
         expiresIn:maxAge
     });
 } 
@@ -54,7 +57,40 @@ const signUpUser =async(req, res)=>{
         
     }
  }
+ const protectRoute=async(req,res,next)=>{
+    try {
+        let token;
+    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+        token= req.headers.authorization.split(' ')[1];
+    }
+
+    if(!token){
+        return res.status(401).json({message:"No authorized no token"}); 
+    }
+    //token verification 
+    const decoded=await promisify(jwt.verify)(token,secretkey);
+    
+    //checking if user still exist
+    const currentUser= await UserModel.findById(decoded.id);
+    if(!currentUser){
+        return res.status(401).json({ message: "The user no longer exists with this token"});
+    }
+    req.user=currentUser;
+    next();
+    } catch (error) {
+        res.status(401).json({ message: 'Not authorized, token failed' });
+    }
+ }
+ const restrictTo=(...roles)=>{
+    return(req,res,next)=>{
+        if(!roles.includes(req.user.user_type)){
+            return res.status(403).json({message:"You donot have permission to perform this action"})
+        }
+        next();
+    }
+    
+ }
  module.exports={
-    signUpUser,loginUser
+    signUpUser,loginUser,protectRoute,restrictTo
  }
  

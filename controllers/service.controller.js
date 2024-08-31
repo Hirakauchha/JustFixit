@@ -1,5 +1,6 @@
 const  express = require("express");
 const Service= require('../models/service.js')
+
 const getServices = async(req, res)=>{
     try {
      const service=await Service.find({});
