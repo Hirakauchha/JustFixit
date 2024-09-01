@@ -3,8 +3,6 @@ const {promisify}= require('util');
 const UserModel= require('../models/user.model.js')
 const bcrypt = require('bcryptjs');
 const jwt= require('jsonwebtoken');
-const { decode } = require("punycode");
-
 
 const maxAge=9*24*60*60
 const secretkey='justfixit-secret'
