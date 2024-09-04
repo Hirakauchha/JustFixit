@@ -4,6 +4,7 @@ const Service= require('./models/service.js');
 const serviceRoute = require("./routes/services.route.js");
 const userRoute=require("./routes/user.route.js");
 const authRoute=require("./routes/auth.route.js");
+const requestRoute=require("./routes/request.route.js");
 
 //middleware
 const app= express()
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use("/api/services", serviceRoute)
 app.use("/api/auth",authRoute);
 app.use("/api/user",userRoute);
+app.use("/api/request",requestRoute);
 
 app.listen(3001,()=>{
     console.log('Server is running on port 3001');

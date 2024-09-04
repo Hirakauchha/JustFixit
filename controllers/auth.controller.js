@@ -47,6 +47,7 @@ const signUpUser =async(req, res)=>{
         res.status(200).json({
              status:'success',
              token,
+             user_type:user.user_type
 
         })
         
