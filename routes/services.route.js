@@ -7,7 +7,7 @@ router.get("/",protectRoute, getServices);
 router.get("/:id",getServiceByID);
 router.post("/",addService);
 router.put("/:id",protectRoute,restrictTo('provider'),updateServices);
-router.put("/:id",protectRoute,restrictTo('provider'),deleteService);
+router.delete("/:id",protectRoute,restrictTo('provider'),deleteService);
 
 
 

@@ -16,7 +16,7 @@ const signUpUser =async(req, res)=>{
         
         const user=await UserModel.create(req.body);
         const token=signToken(user._id);
-        res.status(201).json({
+        res.status(200).json({
             status:'success',
             token,
             data:{
