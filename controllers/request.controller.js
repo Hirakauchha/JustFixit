@@ -12,7 +12,7 @@ const createRequest= async (req, res)=>{
             status,
             request_date:new Date(),
         });
-        res.status(201).json(newRequest);
+        res.status(200).json(newRequest);
     } catch (error) {
         res.status(500).json({message:error.message});
         
