@@ -2,28 +2,13 @@ const  express = require("express");
 const Service= require('../models/service.js')
 const multer=require('multer');
 const { GridFsStorage } = require('multer-gridfs-storage');
-const Grid = require('gridfs-stream');
 const path = require('path');
 const crypto = require('crypto');
-const {mongoURI,gfs}=require('../database/db.js');
-// const multerStorage=multer.diskStorage(
-//    {
-//       destination:(req,file,cb)=>{
-//          cb(null,'images/services')
-//       },
-//       filename:(req, file, cb)=>{
-//            const ext= file.mimetype.split('/')[1];
-//            cb(null,`service-${req.service._id}-${Date.now()}.${ext}`);
-//       }
-//    }
-// );
-// const multerFilter =(req,file,cb)=>{
-//    if(file.mimetype.startsWith('image')){
-//       cb(null,true);
-//    }else{
-//       cb(new AppError('Not an image. Please upload only image.',404),false);
-//    }
-// }
+const {mongoURI}=require('../database/db.js');
+const { MongoClient } = require("mongodb");
+const GridFSBucket = require("mongodb").GridFSBucket
+const mongoClient= new MongoClient(mongoURI);
+
 
 const storage = new GridFsStorage({
    url: mongoURI,
@@ -47,7 +32,7 @@ const upload = multer({ storage });
 const uploadServicePhoto= upload.single('image');
 
 const getServices = async(req, res)=>{
-   console.log("hhiuhiu");
+ 
     try {
      const service=await Service.find({});
      res.status(200).json(service);
@@ -100,49 +85,41 @@ const getServices = async(req, res)=>{
       
    }
  }
- const getServiceImage= async (req, res) => {
-   try {
-      gfs.files.findOne({ filename: req.params.filename }, (err, file) => {
-         if (err) {
-             return res.status(500).json({ error: err.message });
-         }
-         if (!file || file.length === 0) {
-             return res.status(404).json({ error: 'No file found' });
-         }
+const downloadImage=async (req, res) => {
+    try {
+      await mongoClient.connect()
+  
+      const database = mongoClient.db("JustFix-API")
+  
+      const imageBucket = new GridFSBucket(database, {
+        bucketName: "uploads",
+      })
+  
+      let downloadStream = imageBucket.openDownloadStreamByName(
+        req.params.filename
+      )
+  
+      downloadStream.on("data", function (data) {
+        return res.status(200).write(data)
+      })
+  
+      downloadStream.on("error", function (data) {
+        return res.status(404).send({ error: "Image not found" })
+      })
+  
+      downloadStream.on("end", () => {
+        return res.end()
+      })
+    } catch (error) {
+      console.log(error)
+      res.status(500).send({
+        message: "Error Something went wrong",
+        error,
+      })
+    }
+  }
 
-         // Create a read stream from GridFS
-         const readstream = gfs.createReadStream(file.filename);
-         readstream.on('error', (err) => {
-             res.status(500).json({ error: err.message });
-         });
-         readstream.pipe(res);
-     });
- } catch (error) {
-       res.status(500).json({ err: error.message });
-   }
-};
-const getServiceImageById= async (req, res) => {
-   console.log(req.body);
-   try {
-      gfs.files.findOne({ _id: mongoose.Types.ObjectId(req.params.id) }, (err, file) => {
-         if (err) {
-             return res.status(500).json({ error: err.message });
-         }
-         if (!file || file.length === 0) {
-             return res.status(404).json({ error: 'No file found' });
-         }
 
-         // Create a read stream from GridFS
-         const readstream = gfs.createReadStream(file.filename);
-         readstream.on('error', (err) => {
-             res.status(500).json({ error: err.message });
-         });
-         readstream.pipe(res);
-     });
- } catch (error) {
-       res.status(500).json({ err: error.message });
-   }
-};
  const updateServices=async(req,res)=>{
    try {
       const{id}=req.params;
@@ -172,6 +149,16 @@ const getServiceImageById= async (req, res) => {
    }
  }
 
+ const searchService=async(req,res)=>{
+  try {
+    const {query}=req.body;
+    const filter={
+      
+    }
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+ }
  
  
 
@@ -182,6 +169,5 @@ const getServiceImageById= async (req, res) => {
     updateServices,
     deleteService,
     uploadServicePhoto,
-    getServiceImage,
-    getServiceImageById
+    downloadImage
  }

@@ -10,7 +10,7 @@ let gfs;
 // Mongoose connection
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(mongoURI);
+        conn = await mongoose.connect(mongoURI);
         
         console.log("Connected to Database!");
 
@@ -21,11 +21,11 @@ const connectDB = async () => {
         console.error("Connection Failed:", error.message);
     }
 };
-// mongoose.connection.once('open', () => {
-//     const gfs = Grid(mongoose.connection.db, mongoose.mongo);
-//     gfs.collection('uploads'); 
+mongoose.connection.once('open', () => {
+    gfs = Grid(mongoose.connection.db, mongoose.mongo);
+    gfs.collection('uploads'); 
 
-// });
+});
 
 // Export the connection and gfs for file operations
 module.exports = { connectDB, gfs,mongoURI }
