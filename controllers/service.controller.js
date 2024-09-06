@@ -153,8 +153,18 @@ const downloadImage=async (req, res) => {
   try {
     const {query}=req.body;
     const filter={
-      
+      $or:[
+        {name:{$regex:query,$options:'i'}}
+      ]
+
     }
+    const filterData= await Service.find(filter);
+    if(filterData.length==0){
+      return res.status(404).json({message:"Data not found"});
+
+    }
+    
+    return res.status(200).json(filterData);
   } catch (error) {
     res.status(500).json({message: error.message});
   }
@@ -169,5 +179,6 @@ const downloadImage=async (req, res) => {
     updateServices,
     deleteService,
     uploadServicePhoto,
-    downloadImage
+    downloadImage,
+    searchService
  }
