@@ -14,7 +14,7 @@ const RequestSchema=mongoose.Schema(
         },
         status:{
             type:String,
-            enum:["pending","completed","in-progress","canceled"],
+            enum:["pending","approved","canceled"],
             default:'pending',
             required:true,
 

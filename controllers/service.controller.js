@@ -57,21 +57,22 @@ const getServices = async(req, res)=>{
  } 
  const addService=async(req,res)=>{
    try {
-      const { name, description, price } = req.body;
-        console.log(req.body);
-        // Create a new service instance
+      const provider=req.user._id;
+      console.log(provider);
+      const { name, description, price,category} = req.body;
         const service = new Service({
             name,
             description,
             price,
-            image: req.file ? req.file.filename : null // Save the filename of the uploaded image
+            image: req.file ? req.file.filename : null,
+            category,
+            provider
         });
 
-        // Save the service to the database
+        
         await service.save();
 
-        // Return the newly created service with the image link
-        res.status(201).json({
+        res.status(200).json({
             status: 'success',
             data: {
                 service,
@@ -169,7 +170,26 @@ const downloadImage=async (req, res) => {
     res.status(500).json({message: error.message});
   }
  }
- 
+
+ const searchServiceByCategory= async(req,res)=>{
+  try {
+    const{query}=req.body;
+    const filter={
+      $and:[
+        {category:{$regex:query,$options:'i'}}
+      ]
+    }
+    const filterData= await Service.find(filter);
+    if(filterData.length==0){
+      return res.status(404).json({message:"Data not found"});
+
+    }
+    
+    return res.status(200).json(filterData);
+  } catch (error) {
+    res.status(500).json({message: error.message});
+  }
+ }
  
 
  module.exports = {
@@ -180,5 +200,6 @@ const downloadImage=async (req, res) => {
     deleteService,
     uploadServicePhoto,
     downloadImage,
-    searchService
+    searchService,
+    searchServiceByCategory
  }

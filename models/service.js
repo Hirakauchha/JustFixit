@@ -18,7 +18,17 @@ const ServiceSchema = mongoose.Schema(
         },
         image: {
             type:String,
-        } 
+        } ,
+        category:{
+            type:String,
+            enum:["Plumbing","Cleaning","Electricity"],
+            required:true,
+        },
+        provider:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'UserModel',
+            required:true
+        }
     },
     {
         timestamps: true,

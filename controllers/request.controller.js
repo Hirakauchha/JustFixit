@@ -18,6 +18,57 @@ const createRequest= async (req, res)=>{
         
     }
 }
+
+const getRequestHistoryofConsumer= async(req, res)=>{
+    try {
+        const userID= req.user._id;
+        const requestHistory= await Request.aggregate([
+            {
+                $match:{user_id:userID}
+            },
+            {
+                $lookup:{
+                    from:'services',
+                    localField:'service_id',
+                    foreignField:'_id',
+                    as:'serviceDetails'
+                }
+            },
+            {
+                $unwind:'$serviceDetails'
+            },
+            {
+                $lookup:{
+                    from:'usermodels',
+                    localField:'serviceDetails.provider',
+                    foreignField:'_id',
+                    as:'providerDetails'
+                }
+            },
+            {
+                $unwind:'$providerDetails'
+            },
+            {
+                $project: {
+                    name:'$serviceDetails.name',
+                    category:'$serviceDetails.category',
+                    fullname:'$providerDetails.fullname',
+                    status:1,
+                    request_date:1
+
+
+                }
+            }
+            
+           
+        ]);
+    
+        res.status(200).json({requestHistory});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 module.exports={
-    createRequest
+    createRequest,
+    getRequestHistoryofConsumer
 }
