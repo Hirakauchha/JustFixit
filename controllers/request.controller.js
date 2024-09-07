@@ -1,4 +1,5 @@
 const Request= require("../models/request.model.js")
+const Service= require('../models/service.js')
 const createRequest= async (req, res)=>{
     try {
         const user_id=req.user._id;
@@ -50,16 +51,15 @@ const getRequestHistoryofConsumer= async(req, res)=>{
             },
             {
                 $project: {
-                    name:'$serviceDetails.name',
+                    servicename:'$serviceDetails.name',
                     category:'$serviceDetails.category',
-                    fullname:'$providerDetails.fullname',
+                    serviceprovidername:'$providerDetails.fullname',
                     status:1,
                     request_date:1
 
 
                 }
-            }
-            
+            }    
            
         ]);
     
@@ -68,7 +68,68 @@ const getRequestHistoryofConsumer= async(req, res)=>{
         res.status(500).json({ message: error.message });
     }
 }
+
+const getAllRequest=async(req,res)=>{
+    try {
+        const providerId=req.user._id;
+        const services= await Service.find({provider:providerId});
+        if(services.length===0){
+            return res.status(404).json({message:"No services found for this provider."});
+        }
+        const serviceIds= services.map(service=>service._id);
+        const requests = await Request.aggregate([
+            {
+                $match:{service_id:{$in:serviceIds}}
+            },
+            {
+                $lookup:{
+                    from:'usermodels',
+                    localField:'user_id',
+                    foreignField:'_id',
+                    as:'customerDetails'
+                }
+            },
+            {
+                $unwind:'$customerDetails'
+            },
+            {
+                $lookup:{
+                    from:'services',
+                    localField:'service_id',
+                    foreignField:'_id',
+                    as:'serviceDetails'
+
+                }
+            },
+            {
+                $unwind:'$serviceDetails'
+            },
+            {
+                $project:{
+                    'customerDetails.fullname':1,
+                    'customerDetails.email':1,
+                    'serviceDetails.name':1,
+                    'status':1,
+                    'request_date':1
+                }
+            }
+        ]);
+        if(requests.length===0){
+            return res.status(404).json({message:"No requests found for your services"});
+        }
+        res.status(200).json({requests});
+    } catch (error) {
+        res.status(500).json({message:error.message});
+    }
+
+}
+const cancelRequest=async(req,res)=>{
+
+
+
+}
 module.exports={
     createRequest,
-    getRequestHistoryofConsumer
+    getRequestHistoryofConsumer,
+    getAllRequest
 }
