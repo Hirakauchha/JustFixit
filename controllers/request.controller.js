@@ -124,12 +124,59 @@ const getAllRequest=async(req,res)=>{
 
 }
 const cancelRequest=async(req,res)=>{
+    try {
+        const requestID=req.params.id;
+        const providerID=req.user._id;
+        
 
+        const request =await Request.findById(requestID).populate('service_id');
+        
+        if(!request){
+            return res.status(404).json({message: "Request not available or not authoized to cancel request"});
+
+        }
+        request.status='canceled';
+        await request.save();
+        res.status(200).json({message:"Request cancelled successfully",request});
+
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+        
+    }
+    
+
+
+}
+const approveRequest=async(req,res)=>{
+    try {
+        const requestID=req.params.id;
+        const providerID=req.user._id;
+        
+
+        const request =await Request.findById(requestID).populate('service_id');
+        
+        if(!request){
+            return res.status(404).json({message: "Request not available or not authoized to cancel request"});
+
+        }
+        request.status='approved';
+        await request.save();
+        res.status(200).json({message:"Request cancelled successfully",request});
+
+
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+        
+    }
+    
 
 
 }
 module.exports={
     createRequest,
     getRequestHistoryofConsumer,
-    getAllRequest
+    getAllRequest,
+    cancelRequest,
+    approveRequest
 }
