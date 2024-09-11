@@ -23,6 +23,7 @@ const createRequest= async (req, res)=>{
 const getRequestHistoryofConsumer= async(req, res)=>{
     try {
         const userID= req.user._id;
+        console.log(req.body);
         const requestHistory= await Request.aggregate([
             {
                 $match:{user_id:userID}
@@ -62,7 +63,7 @@ const getRequestHistoryofConsumer= async(req, res)=>{
             }    
            
         ]);
-    
+        console.log(requestHistory);
         res.status(200).json({requestHistory});
     } catch (error) {
         res.status(500).json({ message: error.message });

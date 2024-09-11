@@ -28,6 +28,11 @@ const ServiceSchema = mongoose.Schema(
             type:mongoose.Schema.Types.ObjectId,
             ref:'UserModel',
             required:true
+        },
+        availability:{
+            type:String,
+            enum:["available","unavailable"],
+            required:true
         }
     },
     {

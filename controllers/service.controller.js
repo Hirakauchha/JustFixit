@@ -55,18 +55,37 @@ const getServices = async(req, res)=>{
       
    }
  } 
+
+const getServiceByServiceProider=async(req, res)=>{
+  try {
+    console.log("check");
+    const services=await Service.find({provider:providerId});
+    if(!services||services.length===0){
+      return res.status(404).json({ message: 'No services found for this provider.' });
+    }
+    res.status(200).json({
+      status: 'success',
+      data:{
+        services
+      }
+    });
+  } catch (error) {
+    
+  }
+}
+
  const addService=async(req,res)=>{
    try {
       const provider=req.user._id;
-      console.log(provider);
-      const { name, description, price,category} = req.body;
+      const { name, description, price,category,availability} = req.body;
         const service = new Service({
             name,
             description,
             price,
             image: req.file ? req.file.filename : null,
             category,
-            provider
+            provider,
+            availability
         });
 
         
@@ -201,5 +220,6 @@ const downloadImage=async (req, res) => {
     uploadServicePhoto,
     downloadImage,
     searchService,
-    searchServiceByCategory
+    searchServiceByCategory,
+    getServiceByServiceProider
  }

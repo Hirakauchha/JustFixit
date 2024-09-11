@@ -57,6 +57,7 @@ const signUpUser =async(req, res)=>{
     }
  }
  const protectRoute=async(req,res,next)=>{
+    console.log(req.body);
     try {
         let token;
     if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
