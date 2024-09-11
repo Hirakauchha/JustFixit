@@ -4,15 +4,15 @@ const {protectRoute,restrictTo}= require('../controllers/auth.controller.js');
 const { getServices,getServiceByID,addService, 
     updateServices,
     deleteService,uploadServicePhoto,
-    downloadImage,searchService,searchServiceByCategory,getServiceByServiceProider } = require('../controllers/service.controller.js');
+    downloadImage,searchService,searchServiceByCategory,getServiceByServiceProvider } = require('../controllers/service.controller.js');
 const multer=require('multer');
 
 
 router.get("/",protectRoute,getServices);
-router.get("/:id",getServiceByID);
+//router.get("/:id",getServiceByID);
 router.post("/",protectRoute,restrictTo('provider'),uploadServicePhoto,addService);
 router.get("/image/:filename",downloadImage);
-router.get("/getServiceByProvider",protectRoute,getServiceByServiceProider)
+router.get("/getServiceByProvider",protectRoute,getServiceByServiceProvider)
 router.post("/searchService",searchService);
 router.post("/searchServiceByCategory",searchServiceByCategory);
 //router.get("/image/:id",getServiceImageById);

@@ -56,23 +56,7 @@ const getServices = async(req, res)=>{
    }
  } 
 
-const getServiceByServiceProider=async(req, res)=>{
-  try {
-    console.log("check");
-    const services=await Service.find({provider:providerId});
-    if(!services||services.length===0){
-      return res.status(404).json({ message: 'No services found for this provider.' });
-    }
-    res.status(200).json({
-      status: 'success',
-      data:{
-        services
-      }
-    });
-  } catch (error) {
-    
-  }
-}
+
 
  const addService=async(req,res)=>{
    try {
@@ -209,7 +193,24 @@ const downloadImage=async (req, res) => {
     res.status(500).json({message: error.message});
   }
  }
- 
+ const getServiceByServiceProvider=async(req, res)=>{
+  try {
+    console.log(req.body);
+    const providerId=req.user._id;
+    const services=await Service.find({provider:providerId});
+    if(!services||services.length===0){
+      return res.status(404).json({ message: 'No services found for this provider.' });
+    }
+    res.status(200).json({
+      status: 'success',
+      data:{
+        services
+      }
+    });
+  } catch (error) {
+    
+  }
+}
 
  module.exports = {
     getServices,
@@ -221,5 +222,5 @@ const downloadImage=async (req, res) => {
     downloadImage,
     searchService,
     searchServiceByCategory,
-    getServiceByServiceProider
+    getServiceByServiceProvider
  }
